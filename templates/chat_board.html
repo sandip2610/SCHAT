@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Chat</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #e5ddd5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Main Container Styles */
+        .main-container {
+            display: flex;
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 10px;
+            flex-grow: 1;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            height: 90vh;
+        }
+
+        /* Student List Styles */
+        .student-list {
+            width: 30%;
+            min-width: 300px;
+            background: #f8f9fa;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .student-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px;
+            background: #075e54;
+            color: white;
+        }
+
+        .student-list-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .settings-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .settings-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+            color: #075e54;
+        }
+
+        .settings-dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .student-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .student-list li {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .student-list li:hover {
+            background: #f1f1f1;
+        }
+
+        .student-list li.active {
+            background: #075e54;
+            color: white;
+        }
+
+        .student-list li img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #25d366;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .student-list li img:hover {
+            transform: scale(1.05);
+        }
+
+        .student-list li span {
+            font-size: 16px;
+        }
+
+        /* Search Input Styles */
+        .search-container {
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-container input:focus {
+            border-color: #25d366;
+        }
+
+        /* Chat Container Styles */
+        .chat-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+        }
+
+        /* Default state when no chat is selected */
+        .no-chat-selected {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            background: #f8f9fa;
+            color: #666;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .no-chat-selected img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+
+        .no-chat-selected h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .no-chat-selected p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        /* Chat header styles */
+        .chat-header {
+            background: #075e54;
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .chat-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-header-info img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid #25d366;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .chat-header-info img:hover {
+            transform: scale(1.05);
+        }
+
+        .chat-header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-header-buttons a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: background 0.3s ease;
+            font-size: 14px;
+        }
+
+        .chat-header-buttons a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Chat window styles */
+        #chat-window {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: #e5ddd5;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-image: url('{% static "images/chat-bg.png" %}');
+            background-repeat: repeat;
+            background-position: center;
+            background-size: contain;
+        }
+
+        /* Message Styles */
+        .message {
+            padding: 8px 12px;
+            border-radius: 7.5px;
+            max-width: 70%;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+            box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
+        }
+
+        .sent {
+            background: #dcf8c6;
+            color: #000;
+            align-self: flex-end;
+            border-top-right-radius: 0;
+        }
+
+        .received {
+            background: white;
+            color: #000;
+            align-self: flex-start;
+            border-top-left-radius: 0;
+        }
+
+        .message strong {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 3px;
+            color: #075e54;
+            font-weight: 600;
+        }
+
+        .message p {
+            margin: 0;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .message em {
+            display: block;
+            font-size: 11px;
+            color: #666;
+            margin-top: 3px;
+            text-align: right;
+        }
+
+        .message-actions {
+            margin-top: 5px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .message-actions button {
+            border: none;
+            background: transparent;
+            color: #666;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .message-actions button:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .edit-form {
+            display: none;
+            margin-top: 8px;
+            background: white;
+            padding: 8px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .edit-form textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: none;
+            font-size: 14px;
+            min-height: 60px;
+        }
+
+        .edit-form button {
+            margin-top: 8px;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.3s ease;
+        }
+
+        .edit-form button[type="submit"] {
+            background: #25d366;
+            color: white;
+            margin-right: 5px;
+        }
+
+        .edit-form button[type="submit"]:hover {
+            background: #128c7e;
+        }
+
+        .edit-form .cancel-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .edit-form .cancel-btn:hover {
+            background: #c82333;
+        }
+
+        /* Chat Input Styles */
+        .chat-input {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-top: 1px solid #ddd;
+            flex-shrink: 0;
+        }
+
+        .chat-input textarea {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            resize: none;
+            font-size: 14px;
+            min-height: 40px;
+            max-height: 100px;
+        }
+
+        .chat-input input[type="file"] {
+            display: none;
+        }
+
+        .file-input-label {
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .file-input-label:hover {
+            background: #f1f1f1;
+        }
+
+        .chat-input button {
+            padding: 10px 15px;
+            background: #25d366;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .chat-input button:hover {
+            background: #128c7e;
+        }
+
+        /* Profile Photo Modal */
+        .profile-photo-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .profile-photo-modal.active {
+            display: flex;
+        }
+
+        .modal-photo-container {
+            max-width: 90%;
+            max-height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-photo {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 5px;
+        }
+
+        .modal-name {
+            color: white;
+            font-size: 24px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #25d366;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .main-container {
+                width: 100%;
+                height: 100vh;
+                margin-top: 0;
+                border-radius: 0;
+            }
+
+            .student-list {
+                width: 100%;
+                min-width: auto;
+                display: block;
+            }
+
+            .chat-container {
+                display: none;
+            }
+
+            .chat-container.active {
+                display: flex;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 100;
+                background: white;
+            }
+
+            .back-button {
+                display: block;
+                margin-right: 10px;
+                color: white;
+                text-decoration: none;
+            }
+
+            .modal-photo {
+                max-width: 95%;
+                max-height: 70vh;
+            }
+        }
+
+        /* Back button for mobile */
+        .back-button {
+            display: none;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Profile Photo Modal -->
+    <div class="profile-photo-modal" id="profilePhotoModal">
+        <span class="modal-close" onclick="closePhotoModal()">&times;</span>
+        <div class="modal-photo-container">
+            <img class="modal-photo" id="modalPhoto" src="" alt="Profile Photo">
+        </div>
+        <div class="modal-name" id="modalName"></div>
+    </div>
+
+    <div class="main-container">
+        <div class="student-list">
+            <div class="student-list-header">
+                <h3>Students</h3>
+                <div class="settings-dropdown">
+                    <button class="settings-btn"><i class="fas fa-ellipsis-v"></i></button>
+                    <div class="dropdown-content">
+                        <a href="{% url 'profile' %}"><i class="fas fa-user"></i> My Profile</a>
+                        <a href="{% url 'home' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Input -->
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search by name....." oninput="filterStudents()">
+            </div>
+            <ul id="student-list">
+                {% for student in students %}
+                    <li class="{% if receiver and receiver.id == student.id %}active{% endif %}"
+                        onclick="selectStudent('{{ student.id }}')"
+                        data-name="{{ student.name|lower }}"
+                        data-phone="{{ student.phone }}">
+                        <img src="{{ student.photo.url }}" alt="{{ student.name }}"
+                             onclick="showProfilePhoto('{{ student.photo.url }}', '{{ student.name }}', event)">
+                        <span>{{ student.name }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="chat-container {% if not receiver %}no-chat{% endif %}" id="chat-container">
+            {% if receiver %}
+                <div class="chat-header">
+                    <a href="#" class="back-button" onclick="closeChat()">←</a>
+                    <div class="chat-header-info">
+                        <img src="{{ receiver.photo.url }}" alt="{{ receiver.name }}"
+                             onclick="showProfilePhoto('{{ receiver.photo.url }}', '{{ receiver.name }}', event)">
+                        <h2>{{ receiver.name }}</h2>
+                    </div>
+                    <div class="chat-header-buttons">
+                        <a href="{% url 'search_page' %}">SmartChat AI</a>
+                        <a href="{% url 'all_statuses' %}">Status</a>
+                        <a href="#" onclick="startVideoCall()">Call</a>
+
+
+                    </div>
+                </div>
+                <div id="chat-window">
+                    {% for message in messages %}
+                        <div class="message {% if message.sender.id == request.session.student_id %}sent{% else %}received{% endif %}">
+                            <strong>{% if message.sender.id == request.session.student_id %}You{% else %}{{ message.sender.name }}{% endif %}</strong>
+                            <p id="message-content-{{ message.id }}">{{ message.content }}</p>
+                            {% if message.file %}
+                                <a href="{{ message.file.url }}" target="_blank">View/Download File</a>
+                            {% endif %}
+                            <em>{{ message.timestamp }}</em>
+                            {% if message.sender.id == request.session.student_id %}
+                                <div class="message-actions">
+                                    <form method="POST" action="{% url 'delete_message' message.id %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this message?');">Delete</button>
+                                    </form>
+                                    {% if not message.file %}
+                                        <button class="edit-btn" onclick="toggleEditForm({{ message.id }})">Edit</button>
+                                    {% endif %}
+                                </div>
+                                {% if not message.file %}
+                                    <form class="edit-form" id="edit-form-{{ message.id }}" method="POST" action="{% url 'edit_message' message.id %}">
+                                        {% csrf_token %}
+                                        <textarea name="new_content">{{ message.content }}</textarea>
+                                        <button type="submit">Save</button>
+                                        <button type="button" class="cancel-btn" onclick="toggleEditForm({{ message.id }})">Cancel</button>
+                                    </form>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <form method="post" enctype="multipart/form-data" class="chat-form">
+                    {% csrf_token %}
+                    <div class="chat-input">
+                        <label for="file-input" class="file-input-label">📎</label>
+                        <input type="file" id="file-input" name="file" accept="image/*, .pdf, .docx, .txt" />
+                        <textarea name="content" placeholder="Type your message..." required></textarea>
+                        <input type="hidden" name="receiver_id" value="{{ receiver.id }}" />
+                        <button type="submit">➤</button>
+                    </div>
+                </form>
+
+            {% else %}
+                <div class="no-chat-selected">
+                    <img src="{% static 'logoo.jpg' %}" alt="WhatsApp">
+                    <h1>Well Come To SmartChat</h1>
+                    <H3>Select A Profile To Start End-To-End Chatting Or Colling</H3>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <script>
+        // Chat functionality
+        function selectStudent(studentId) {
+            // Update the URL with the selected student
+            window.location.href = `{% url 'chat_board' %}?receiver_id=${studentId}`;
+        }
+
+        function closeChat() {
+            // Go back to just the student list
+            window.location.href = "{% url 'chat_board' %}";
+        }
+
+        function filterStudents() {
+            const searchQuery = document.getElementById('search-input').value.toLowerCase();
+            const studentItems = document.querySelectorAll('#student-list li');
+            studentItems.forEach((item) => {
+                const name = item.getAttribute('data-name');
+                const phone = item.getAttribute('data-phone');
+                if (name.includes(searchQuery) || phone.includes(searchQuery)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function scrollToBottom() {
+            const chatWindow = document.getElementById('chat-window');
+            if (chatWindow) {
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+        }
+
+        window.onload = scrollToBottom;
+
+        function toggleEditForm(messageId) {
+            const form = document.getElementById(`edit-form-${messageId}`);
+            const content = document.getElementById(`message-content-${messageId}`);
+            if (form.style.display === "none" || !form.style.display) {
+                form.style.display = "block";
+                content.style.display = "none";
+            } else {
+                form.style.display = "none";
+                content.style.display = "block";
+            }
+            scrollToBottom();
+        }
+
+        // Profile photo modal functions
+        function showProfilePhoto(photoUrl, name, event) {
+            // Stop event propagation to prevent the click from triggering other events
+            event.stopPropagation();
+
+            const modal = document.getElementById('profilePhotoModal');
+            const modalPhoto = document.getElementById('modalPhoto');
+            const modalName = document.getElementById('modalName');
+
+            modalPhoto.src = photoUrl;
+            modalName.textContent = name;
+            modal.classList.add('active');
+
+            // Prevent scrolling when modal is open
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePhotoModal() {
+            const modal = document.getElementById('profilePhotoModal');
+            modal.classList.remove('active');
+
+            // Restore scrolling
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside the image
+        document.getElementById('profilePhotoModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePhotoModal();
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdowns = document.getElementsByClassName("dropdown-content");
+            const settingsBtn = document.querySelector(".settings-btn");
+
+            if (!event.target.matches('.settings-btn') && !event.target.closest('.settings-dropdown')) {
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.style.display === 'block') {
+                        openDropdown.style.display = 'none';
+                    }
+                }
+            }
+        });
+
+        // Mobile responsiveness
+        function checkScreenSize() {
+            const chatContainer = document.getElementById('chat-container');
+            if (window.innerWidth <= 768) {
+                // On mobile, hide chat container by default
+                if (window.location.search.includes('receiver_id')) {
+                    chatContainer.classList.add('active');
+                } else {
+                    chatContainer.classList.remove('active');
+                }
+                document.querySelector('.back-button').style.display = 'block';
+            } else {
+                // On desktop, always show both panels
+                chatContainer.classList.add('active');
+                document.querySelector('.back-button').style.display = 'none';
+            }
+        }
+
+        // Check screen size on load and resize
+        window.addEventListener('load', checkScreenSize);
+        window.addEventListener('resize', checkScreenSize);
+    </script>
+</body>
+</html>

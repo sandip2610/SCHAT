@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url("{% static '91996463.cms' %}");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 50vh;
+            margin: 0;
+            color: #333;
+        }
+        /* Edit Profile Container */
+        .edit-profile-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 500px;
+            height: auto;
+            margin-top: 10px;
+        }
+        h2 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 10px;
+        }
+        input[type="text"], input[type="email"], input[type="date"], input[type="password"], input[type="file"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 95.2%;
+        }
+    </style>
+</head>
+<body>
+    <div class="edit-profile-container">
+        <h2>Edit Profile</h2>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <p style="color: red; text-align: center;">*No Change Password!</p>
+            <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                <a href="{% url 'profile' %}"
+                   style="flex: 1; text-align: center; padding: 10px; text-decoration: none; background-color: #0056b3; color: white; border-radius: 4px; font-size: 1em; margin-right: 10px;">
+                    Go to Profile
+                </a>
+                <button type="submit"
+                        style="flex: 1; padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; font-size: 1em; margin-left: 10px;">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

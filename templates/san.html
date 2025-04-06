@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ideal Education</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body {
+            background-color: #f7f4e8;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #4CAF50;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar .logo {
+            display: flex;
+            align-items: center;
+            color: white;
+            font-size: 2em;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .navbar .logo img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        .navbar .menu {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+        .navbar .menu .profile {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+        }
+        .navbar .menu .profile-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            font-size: 3em;
+            margin-top: 20px;
+        }
+        h2 {
+            text-align: center;
+            color: #333366;
+            font-size: 2em;
+            margin-top: 20px;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 2px solid #4CAF50;
+            padding: 15px;
+            text-align: center;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 1.1em;
+        }
+        td {
+            background-color: #f9f9f9;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .chat-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            font-size: 24px;
+            padding: 15px;
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .chat-icon:hover {
+            background-color: #218838;
+        }
+        /* Right Sidebar Icons */
+        .right-icons {
+            position: fixed;
+            right: 20px;
+            top: 100px;
+            z-index: 1000;
+        }
+        .right-icons a {
+            display: block;
+            margin-bottom: 20px;
+            font-size: 30px;
+            color: #fff;
+            background-color: #28a745;
+            padding: 10px;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+            text-align: center;
+        }
+        .right-icons a:hover {
+            background-color: #0056b3;
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .section {
+                align-items: center;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <a href="{% url 'home' %}" class="logo">
+        <img src="{% static 'logo.png' %}" alt="Logo">SmartChat</a>
+    <div class="menu">
+        <a href="{% url 'profile' %}" class="profile">
+            <img src="{% static 'icone.jpeg' %}" alt="Profile Icon" class="profile-icon">
+            Profile
+        </a>
+    </div>
+</div>
+
+<div class="container">
+    <h2>CLASS</h2>
+    <table>
+        <tr>
+            <th>Metting Room</th>
+            <th>Action</th>
+        </tr>
+        <tr>
+            <td>Metting Room 1</td>
+            <td><a href="https://meet.google.com/dey-tncq-qrx">Metting Room 1</a></td>
+        </tr>
+        <tr>
+            <td>Metting Room 2</td>
+            <td><a href="https://meet.google.com/tih-icyq-brx">Metting Room 2</a></td>
+        </tr>
+    </table>
+</div>
+<div class="chat-icon" onclick="window.location.href='{% url 'chat_board' %}'">💬</div>
+</body>
+</html>

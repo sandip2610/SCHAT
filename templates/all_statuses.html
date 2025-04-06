@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Statuses</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        /* WhatsApp-inspired body style */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #e5ddd5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Status Container */
+        .status-container {
+            width: 100%;
+            max-width: 500px;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            padding: 15px;
+            background: #075e54;
+            color: white;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Header Buttons Container */
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Button Styles */
+        .header-btn {
+            padding: 10px 20px;
+            background-color: #25d366;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .header-btn:hover {
+            background-color: #128c7e;
+            transform: scale(1.05);
+        }
+
+        /* Search Bar */
+        .search-bar {
+            padding: 10px;
+            background: #f0f0f0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .search-bar input {
+            width: 95%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-bar input:focus {
+            border-color: #25d366;
+        }
+
+        /* Status Item */
+        .status-item {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.3s;
+        }
+
+        .status-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        /* Student Info */
+        .student-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .student-info img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+            border: 2px solid #25d366;
+        }
+
+        .student-info span {
+            font-size: 16px;
+            font-weight: 500;
+            color: #075e54;
+        }
+
+        /* Status Content */
+        .status-content {
+            margin-left: 65px;
+        }
+
+        .status-content img,
+        .status-content video {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+        }
+
+        .status-content video {
+            background: black;
+        }
+
+        /* Timestamp */
+        .timestamp {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+            margin-left: 65px;
+        }
+
+        /* Delete Button */
+        .delete-btn {
+            margin-top: 10px;
+            margin-left: 65px;
+            padding: 8px 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-container">
+        <!-- Header -->
+        <div class="header">
+            <span>SmartChat</span>
+            <!-- Header Buttons -->
+            <div class="header-buttons">
+                <a href="{% url 'chat_board' %}" class="header-btn">Chat</a>
+                <a href="{% url 'upload_status' %}" class="header-btn">Upload New Status</a>
+            </div>
+        </div>
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search by name..." oninput="filterStatuses()">
+        </div>
+        <!-- Status List -->
+        <div id="statusList">
+            {% for status in statuses %}
+                <div class="status-item" data-student-name="{{ status.student.name|lower }}">
+                    <!-- Student Info -->
+                    <div class="student-info">
+                        <img src="{{ status.student.photo.url }}" alt="{{ status.student.name }}">
+                        <span>{{ status.student.name }}</span>
+                    </div>
+                    <!-- Status Content -->
+                    <div class="status-content">
+                        {% if status.content %}
+                            {% if status.content.url|lower|slice:"-4:" == ".mp4" %}
+                                <video controls>
+                                    <source src="{{ status.content.url }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            {% else %}
+                                <img src="{{ status.content.url }}" alt="Status">
+                            {% endif %}
+                        {% endif %}
+                        <p>{{ status.text }}</p>
+                    </div>
+                    <!-- Timestamp -->
+                    <div class="timestamp">
+                        Date: {{ status.timestamp }}
+                        <span style="font-size: 13px; color: #888;">
+                        (This status will be deleted after 24 hours.)</span>
+
+                    </div>
+                    <!-- Delete Button (only show if the status belongs to the logged-in student) -->
+                    {% if status.student.id == request.session.student_id %}
+                        <form method="post" action="{% url 'delete_status' status.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="delete-btn">Delete</button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <div class="status-item" style="text-align: center; color: #666;">
+                    No statuses found.
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <!-- JavaScript for Search Functionality -->
+    <script>
+        function filterStatuses() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const statusItems = document.querySelectorAll('.status-item');
+
+            statusItems.forEach(item => {
+                const studentName = item.getAttribute('data-student-name');
+                if (studentName.includes(searchInput)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
