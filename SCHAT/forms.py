@@ -33,12 +33,19 @@ class LoginForm(forms.Form):
 
 
 class EditProfileForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput, required=False)
-
     class Meta:
         model = Student
-        exclude = ['phone_number', 'password']
-        fields = ['name', 'email', 'dob', 'phone_number', 'gender', 'photo', 'password']
+        fields = ['name', 'email', 'dob', 'phone_number', 'gender', 'photo']
+
+    def __init__(self, *args, **kwargs):
+        super(EditProfileForm, self).__init__(*args, **kwargs)
+
+        # Disable password and email so they can't be edited
+        if 'password' in self.fields:
+            self.fields['password'].disabled = True
+
+        if 'email' in self.fields:
+            self.fields['email'].disabled = True
 
 class PasswordResetForm(forms.Form):
         email = forms.EmailField()

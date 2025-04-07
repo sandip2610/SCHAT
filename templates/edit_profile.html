@@ -7,64 +7,244 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <style>
+        :root {
+            --whatsapp-green: #25D366;
+            --whatsapp-dark-green: #128C7E;
+            --whatsapp-light: #e5f4ea;
+            --whatsapp-gray: #f0f2f5;
+            --whatsapp-dark-gray: #667781;
+            --whatsapp-white: #ffffff;
+            --whatsapp-black: #111b21;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background-color: var(--whatsapp-gray);
+            margin: 0;
+            padding: 0;
+            color: var(--whatsapp-black);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .edit-profile-container {
+            background-color: var(--whatsapp-white);
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            max-height: 800px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            background-color: var(--whatsapp-dark-green);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-weight: 500;
+            font-size: 1.2rem;
+        }
+
+        .back-button {
+            color: white;
+            text-decoration: none;
+            font-size: 1.5rem;
+        }
+
+        .profile-content {
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .profile-picture-section {
             display: flex;
             flex-direction: column;
             align-items: center;
-            height: 50vh;
-            margin: 0;
-            color: #333;
+            margin-bottom: 25px;
         }
-        /* Edit Profile Container */
-        .edit-profile-container {
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 500px;
-            height: auto;
-            margin-top: 0px;
+
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+            border: 3px solid var(--whatsapp-light);
         }
-        h2 {
-            text-align: center;
-            color: #4CAF50;
+
+        .change-photo {
+            color: var(--whatsapp-dark-green);
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .form-group {
             margin-bottom: 20px;
         }
-        form {
-            display: flex;
-            flex-direction: column;
-        }
+
         label {
-            margin-top: 10px;
+            display: block;
+            margin-bottom: 5px;
+            color: var(--whatsapp-dark-green);
+            font-size: 0.9rem;
+            font-weight: 500;
         }
-        input[type="text"], input[type="email"], input[type="date"], input[type="password"], input[type="file"] {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            width: 95.2%;
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e9edef;
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: var(--whatsapp-gray);
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--whatsapp-dark-green);
+            background-color: var(--whatsapp-white);
+        }
+
+        input[disabled] {
+            background-color: #f5f6f6;
+            color: var(--whatsapp-dark-gray);
+            cursor: not-allowed;
+        }
+
+        .save-button {
+            background-color: var(--whatsapp-dark-green);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.2s;
+        }
+
+        .save-button:hover {
+            background-color: #075e54;
+        }
+
+        .non-editable-note {
+            color: var(--whatsapp-dark-gray);
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        @media (max-width: 600px) {
+            .edit-profile-container {
+                max-height: none;
+                height: 100vh;
+            }
         }
     </style>
 </head>
 <body>
     <div class="edit-profile-container">
-        <h2>Edit Profile</h2>
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <p style="color: red; text-align: center;">*No Change Password!</p>
-            <div style="display: flex; justify-content: space-between; margin-top: 5px;">
-                <a href="{% url 'profile' %}"
-                   style="flex: 1; text-align: center; padding: 10px; text-decoration: none; background-color: #0056b3; color: white; border-radius: 4px; font-size: 1em; margin-right: 10px;">
-                    Go to Profile
-                </a>
-                <button type="submit"
-                        style="flex: 1; padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; font-size: 1em; margin-left: 10px;">
-                    Save Changes
-                </button>
+        <div class="header">
+            <a href="{% url 'profile' %}" class="back-button">←</a>
+            <h2>Edit Profile</h2>
+        </div>
+
+        <div class="profile-content">
+            <div class="profile-picture-section">
+                {% if form.photo.value %}
+                    <img src="{{ form.photo.value.url }}" alt="Profile Picture" class="profile-picture">
+                {% else %}
+                    <div class="profile-picture" style="background-color: #dfe5e7; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 3rem; color: #7d8b91;">👤</span>
+                    </div>
+                {% endif %}
+                <button type="button" class="change-photo">Change photo</button>
+                <input type="file" id="id_photo" name="photo" accept="image/*" style="display: none;">
             </div>
-        </form>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="id_name">Name</label>
+                    {{ form.name }}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_email">Email</label>
+                    <input type="email" id="id_email" value="{{ form.email.value }}" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_dob">Date of Birth</label>
+                    {{ form.dob }}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_phone_number">Phone Number</label>
+                    {{ form.phone_number }}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_gender">Gender</label>
+                    {{ form.gender }}
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" value="••••••••" disabled>
+                </div>
+
+                <p class="non-editable-note">* Email and password cannot be changed here</p>
+
+                <button type="submit" class="save-button">SAVE CHANGES</button>
+            </form>
+        </div>
     </div>
+
+    <script>
+        // Change photo button functionality
+        document.querySelector('.change-photo').addEventListener('click', function() {
+            document.getElementById('id_photo').click();
+        });
+
+        // Preview image when selected
+        document.getElementById('id_photo').addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const profilePic = document.querySelector('.profile-picture');
+                    if (profilePic.tagName === 'IMG') {
+                        profilePic.src = event.target.result;
+                    } else {
+                        // Replace the placeholder div with an image
+                        const newImg = document.createElement('img');
+                        newImg.src = event.target.result;
+                        newImg.className = 'profile-picture';
+                        profilePic.parentNode.replaceChild(newImg, profilePic);
+                    }
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+    </script>
 </body>
 </html>
