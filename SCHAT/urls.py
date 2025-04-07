@@ -3,9 +3,6 @@ from . import views
 from django.contrib.auth import views as auth_views
 from .views import upload_status
 
-
-
-
 urlpatterns = [
     path('', views.home, name='home'),
     path('register/', views.register, name='register'),
@@ -26,7 +23,6 @@ urlpatterns = [
     path('all-statuses/', views.all_statuses, name='all_statuses'),
     path('delete-status/<int:status_id>/', views.delete_status, name='delete_status'),
     path('video_call/<str:room_name>/', views.video_call, name='video_call'),
-
     path('search_page', views.search_page, name='search_page'),
     path('search/', views.get_search_result, name='get_search_result'),
 

@@ -8,127 +8,291 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --whatsapp-green: #128C7E;
+            --whatsapp-light-green: #25D366;
+            --whatsapp-teal-green: #075E54;
+            --whatsapp-chat-bg: #e5ddd5;
+            --whatsapp-white: #ffffff;
+            --whatsapp-gray: #3b4a54;
+            --whatsapp-light-gray: #f0f2f5;
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
-            background-image: url("{% static 'jhghkjk.png' %}");
-            background-size: cover;
-            background-position: center;
+            font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+            background-color: var(--whatsapp-light-gray);
             margin: 0;
-            color: #fff;
+            color: var(--whatsapp-gray);
+            height: 100vh;
         }
-        .container {
+
+        .header {
+            background-color: var(--whatsapp-teal-green);
+            color: white;
+            padding: 15px 20px;
             display: flex;
-            justify-content: space-between;
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 80px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 20px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-            gap: 20px;
-        }
-        .section {
-            flex: 1;
-            padding: 25px;
-            border-radius: 15px;
-            background: linear-gradient(135deg, #f0f8ff, #e6f7ff);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        .section h3 {
-            margin-bottom: 20px;
-            font-weight: 700;
-            color: #0056b3;
-            text-align: center;
-            font-size: 1.5rem;
-        }
-        .section p {
-            margin: 10px 0;
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: #333;
-        }
-        .section p strong {
-            color: #0056b3;
-        }
-        .photo-container img {
-            width: 160px;
-            height: 160px;
-            border-radius: 50%;
-            border: 4px solid #0056b3;
-        }
-        .btn-container {
-            text-align: center;
-            margin-top: 30px;
-        }
-        .action-button {
-            text-decoration: none;
-            font-size: 1.1rem;
-            font-weight: bold;
-            padding: 12px 30px;
-            border-radius: 10px;
-            margin: 10px;
-            color: #fff;
-            background-color: #0056b3;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-        .action-button:hover {
-            background-color: #003b73;
-            transform: translateY(-2px);
-        }
-        .chat-icon {
+            align-items: center;
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #28a745;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .header i {
+            font-size: 20px;
+            margin-right: 20px;
+            cursor: pointer;
+        }
+
+        .header h1 {
+            font-size: 19px;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 70px auto 20px;
+            background-color: var(--whatsapp-white);
+            border-radius: 8px;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .profile-header {
+            background-color: var(--whatsapp-teal-green);
+            padding: 30px 20px 20px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .photo-container {
+            margin-bottom: 15px;
+        }
+
+        .photo-container img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid rgba(255,255,255,0.3);
+            object-fit: cover;
+        }
+
+        .profile-header h2 {
+            margin: 10px 0 5px;
+            font-weight: 500;
+        }
+
+        .profile-header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .profile-details {
+            padding: 15px 0;
+        }
+
+        .detail-item {
+            display: flex;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--whatsapp-light-gray);
+            align-items: center;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-icon {
+            width: 24px;
+            text-align: center;
+            margin-right: 15px;
+            color: var(--whatsapp-teal-green);
+        }
+
+        .detail-content {
+            flex: 1;
+        }
+
+        .detail-content h4 {
+            margin: 0 0 3px;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .detail-content p {
+            margin: 0;
+            color: var(--whatsapp-gray);
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        .action-buttons {
+            display: flex;
+            padding: 15px;
+            background-color: var(--whatsapp-light-gray);
+            border-top: 1px solid #ddd;
+        }
+
+        .action-button {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            margin: 0 5px;
+            border-radius: 5px;
+            background-color: var(--whatsapp-green);
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .action-button:hover {
+            background-color: var(--whatsapp-teal-green);
+        }
+
+        .action-button.secondary {
+            background-color: #f0f2f5;
+            color: var(--whatsapp-gray);
+        }
+
+        .action-button.secondary:hover {
+            background-color: #e5e5e5;
+        }
+
+        .floating-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: var(--whatsapp-light-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
             font-size: 24px;
-            padding: 15px;
-            border-radius: 50%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: transform 0.2s;
+            z-index: 90;
         }
-        .chat-icon:hover {
-            background-color: #218838;
+
+        .floating-button:hover {
+            transform: scale(1.1);
         }
-        @media (max-width: 768px) {
+
+        .password-warning {
+            background-color: #fff8e1;
+            padding: 10px 20px;
+            margin: 10px 20px;
+            border-radius: 5px;
+            color: #ff6d00;
+            font-size: 14px;
+            text-align: center;
+            border-left: 4px solid #ff6d00;
+        }
+
+        @media (max-width: 600px) {
             .container {
-                flex-direction: column;
-                gap: 15px;
+                margin: 60px 10px 20px;
             }
-            .section {
-                align-items: center;
-                text-align: center;
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-button {
+                margin: 5px 0;
+            }
+
+            .floating-button {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
             }
         }
     </style>
 </head>
 <body>
-
+<div class="header">
+    <i class="fas fa-arrow-left" onclick="history.back()"></i>
+    <h1>Profile</h1>
+</div>
 <div class="container">
-    <div class="section photo-container">
-        <h3>Profile Photo</h3>
-        {% if student.photo %}
-            <img src="{{ student.photo.url }}" alt="Profile Photo">
-        {% else %}
-            <p>No photo available</p>
-        {% endif %}
-        <p style="color: red;">If You Used Temporary Email Password So You Change The Password!</p>
-        <a href="{% url 'change_password' %}" class="action-button">Change Password</a>
+    <div class="profile-header">
+        <div class="photo-container">
+            {% if student.photo %}
+                <img src="{{ student.photo.url }}" alt="Profile Photo">
+            {% else %}
+                <div style="width:120px;height:120px;border-radius:50%;background:#ddd;margin:0 auto;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-user" style="font-size:40px;color:#888;"></i>
+                </div>
+            {% endif %}
+        </div>
+        <h2>{{ student.name }}</h2>
+        <p>Student</p>
     </div>
-    <div class="section">
-        <h3>Profile Information</h3>
-        <p><strong>Name:</strong> {{ student.name }}</p>
-        <p><strong>Gender:</strong> {{ student.gender }}</p>
-        <p><strong>Date of Birth:</strong> {{ student.dob }}</p>
-        <p><strong>Phone Number:</strong> {{ student.phone_number }}</p>
-        <p><strong>Email:</strong> {{ student.email }}</p>
-        <a href="{% url 'edit_profile' student_id=student.id %}" class="action-button">Edit Profile</a>
+    {% if temporary_email_warning %}
+    <div class="password-warning">
+        If you used a temporary email, please change your password!
+    </div>
+    {% endif %}
+    <div class="profile-details">
+        <div class="detail-item">
+            <div class="detail-icon">
+                <i class="fas fa-venus-mars"></i>
+            </div>
+            <div class="detail-content">
+                <h4>Gender</h4>
+                <p>{{ student.gender }}</p>
+            </div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-icon">
+                <i class="fas fa-birthday-cake"></i>
+            </div>
+            <div class="detail-content">
+                <h4>Date of Birth</h4>
+                <p>{{ student.dob }}</p>
+            </div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-icon">
+                <i class="fas fa-phone"></i>
+            </div>
+            <div class="detail-content">
+                <h4>Phone Number</h4>
+                <p>{{ student.phone_number }}</p>
+            </div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-icon">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <div class="detail-content">
+                <h4>Email</h4>
+                <p>{{ student.email }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="action-buttons">
+        <a href="{% url 'edit_profile' student_id=student.id %}" class="action-button">
+            <i class="fas fa-edit"></i> Edit Profile
+        </a>
+        <a href="{% url 'change_password' %}" class="action-button secondary">
+            <i class="fas fa-key"></i> Change Password
+        </a>
     </div>
 </div>
-
-<div class="chat-icon" onclick="window.location.href='{% url 'chat_board' %}'">💬</div>
-
+<div class="floating-button" onclick="window.location.href='{% url 'chat_board' %}'">
+    <i class="fas fa-comment"></i>
+</div>
 </body>
 </html>

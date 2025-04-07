@@ -18,18 +18,16 @@
             align-items: center;
             min-height: 100vh;
         }
-
         /* Status Container */
         .status-container {
             width: 100%;
             max-width: 500px;
-            margin-top: 20px;
+            margin-top: 0px;
             background: white;
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
-
         /* Header */
         .header {
             padding: 15px;
@@ -42,13 +40,11 @@
             justify-content: space-between;
             align-items: center;
         }
-
         /* Header Buttons Container */
         .header-buttons {
             display: flex;
             gap: 10px;
         }
-
         /* Button Styles */
         .header-btn {
             padding: 10px 20px;
@@ -62,19 +58,16 @@
             cursor: pointer;
             transition: background-color 0.3s, transform 0.2s;
         }
-
         .header-btn:hover {
             background-color: #128c7e;
             transform: scale(1.05);
         }
-
         /* Search Bar */
         .search-bar {
             padding: 10px;
             background: #f0f0f0;
             border-bottom: 1px solid #ddd;
         }
-
         .search-bar input {
             width: 95%;
             padding: 10px;
@@ -83,29 +76,24 @@
             font-size: 14px;
             outline: none;
         }
-
         .search-bar input:focus {
             border-color: #25d366;
         }
-
         /* Status Item */
         .status-item {
             padding: 15px;
             border-bottom: 1px solid #f0f0f0;
             transition: background-color 0.3s;
         }
-
         .status-item:hover {
             background-color: #f9f9f9;
         }
-
         /* Student Info */
         .student-info {
             display: flex;
             align-items: center;
             margin-bottom: 15px;
         }
-
         .student-info img {
             width: 50px;
             height: 50px;
@@ -113,29 +101,24 @@
             margin-right: 15px;
             border: 2px solid #25d366;
         }
-
         .student-info span {
             font-size: 16px;
             font-weight: 500;
             color: #075e54;
         }
-
         /* Status Content */
         .status-content {
             margin-left: 65px;
         }
-
         .status-content img,
         .status-content video {
             width: 100%;
             max-width: 400px;
             border-radius: 10px;
         }
-
         .status-content video {
             background: black;
         }
-
         /* Timestamp */
         .timestamp {
             font-size: 12px;
@@ -143,7 +126,6 @@
             margin-top: 10px;
             margin-left: 65px;
         }
-
         /* Delete Button */
         .delete-btn {
             margin-top: 10px;
@@ -157,7 +139,6 @@
             font-size: 14px;
             transition: background-color 0.3s;
         }
-
         .delete-btn:hover {
             background-color: #c82333;
         }
@@ -206,7 +187,6 @@
                         Date: {{ status.timestamp }}
                         <span style="font-size: 13px; color: #888;">
                         (This status will be deleted after 24 hours.)</span>
-
                     </div>
                     <!-- Delete Button (only show if the status belongs to the logged-in student) -->
                     {% if status.student.id == request.session.student_id %}

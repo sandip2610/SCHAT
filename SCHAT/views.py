@@ -15,7 +15,6 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from .forms import StatusForm
 
-
 def home(request):
     return render(request, 'home.html')
 
@@ -28,8 +27,12 @@ def register(request):
         gender = request.POST.get('gender', '').strip()
         password = request.POST.get('password', '').strip()
         photo = request.FILES.get('photo')
-        if not all([name, email, phone_number, dob, gender, password]):
+        if not all([name, email, phone_number, dob, gender, password, photo]):
             messages.error(request, 'Please fill all the required fields.')
+            return render(request, 'register.html')
+        # Check if email already exists
+        if Student.objects.filter(email=email).exists():
+            messages.error(request, 'This email is already registered. Please use a different one.')
             return render(request, 'register.html')
         student = Student(
             name=name,
@@ -37,7 +40,7 @@ def register(request):
             phone_number=phone_number,
             gender=gender,
             dob=dob,
-            password=password,
+            password=password,  # Consider using hashed password!
             photo=photo
         )
         student.save()
@@ -119,7 +122,6 @@ def profile(request):
         student = Student.objects.get(id=student_id)
     except Student.DoesNotExist:
         return redirect('login')
-
     return render(request, 'profile.html', {'student': student})
 
 def chat_board(request):
@@ -224,7 +226,6 @@ def edit_profile(request, student_id):
 def success_view(request):
     return render(request, 'success.html')
 
-
 def video_call(request, room_name):
     return render(request, 'chat_board.html', {'room_name': room_name})
 
@@ -246,6 +247,7 @@ def google_search(query):
             return "I couldn't find any information about that....."
     except Exception as e:
         return f"An error occurred: {str(e)}"
+
 def get_search_result(request):
     user_query = request.GET.get('query', '')
     result = google_search(user_query)
