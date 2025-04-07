@@ -40,12 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
-#ASGI_APPLICATION = 'CHAT.asgi.application'
-#CHANNEL_LAYERS = {
-#    'default': {
-#       'BACKEND': 'channels.layers.InMemoryChannelLayer',
-#    },
-#}
 
 ASGI_APPLICATION = 'SCHAT.asgi.application'
 
@@ -162,11 +156,12 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'sandipmandalcom01@gmail.com'
 EMAIL_HOST_PASSWORD = 'geea czqj xasg xbap'
 
-
-
 CELERY_BEAT_SCHEDULE = {
     'delete-expired-statuses': {
         'task': 'SCHAT.tasks.delete_expired_statuses',
-        'schedule': 3600.0,  # প্রতি ঘন্টায় একবার চালান
+        'schedule': 3600.0,
     },
 }
+CSRF_TRUSTED_ORIGINS = [
+    'https://schat-ypfa.onrender.com'
+]
