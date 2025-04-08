@@ -72,6 +72,7 @@
             flex-direction: column;
             align-items: center;
             margin-bottom: 25px;
+            position: relative;
         }
 
         .profile-picture {
@@ -152,6 +153,10 @@
             font-style: italic;
         }
 
+        #id_photo {
+            display: none;
+        }
+
         @media (max-width: 600px) {
             .edit-profile-container {
                 max-height: none;
@@ -168,20 +173,20 @@
         </div>
 
         <div class="profile-content">
-            <div class="profile-picture-section">
-                {% if form.photo.value %}
-                    <img src="{{ form.photo.value.url }}" alt="Profile Picture" class="profile-picture">
-                {% else %}
-                    <div class="profile-picture" style="background-color: #dfe5e7; display: flex; align-items: center; justify-content: center;">
-                        <span style="font-size: 3rem; color: #7d8b91;">👤</span>
-                    </div>
-                {% endif %}
-                <button type="button" class="change-photo">Change photo</button>
-                <input type="file" id="id_photo" name="photo" accept="image/*" style="display: none;">
-            </div>
-
             <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
+
+                <div class="profile-picture-section">
+                    {% if form.photo.value %}
+                        <img src="{{ form.photo.value.url }}" alt="Profile Picture" class="profile-picture" id="profile-picture">
+                    {% else %}
+                        <div id="profile-picture" class="profile-picture" style="background-color: #dfe5e7; display: flex; align-items: center; justify-content: center;">
+                            <span style="font-size: 3rem; color: #7d8b91;">👤</span>
+                        </div>
+                    {% endif %}
+                    <button type="button" class="change-photo">Change photo</button>
+                    {{ form.photo }}
+                </div>
 
                 <div class="form-group">
                     <label for="id_name">Name</label>
@@ -231,15 +236,18 @@
             if (e.target.files && e.target.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    const profilePic = document.querySelector('.profile-picture');
-                    if (profilePic.tagName === 'IMG') {
-                        profilePic.src = event.target.result;
+                    const profilePicContainer = document.getElementById('profile-picture');
+
+                    // Check if it's already an image or a div placeholder
+                    if (profilePicContainer.tagName === 'IMG') {
+                        profilePicContainer.src = event.target.result;
                     } else {
                         // Replace the placeholder div with an image
                         const newImg = document.createElement('img');
                         newImg.src = event.target.result;
                         newImg.className = 'profile-picture';
-                        profilePic.parentNode.replaceChild(newImg, profilePic);
+                        newImg.id = 'profile-picture';
+                        profilePicContainer.parentNode.replaceChild(newImg, profilePicContainer);
                     }
                 };
                 reader.readAsDataURL(e.target.files[0]);

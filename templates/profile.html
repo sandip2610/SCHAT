@@ -3,279 +3,262 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profile</title>
+    <title>Student Profile</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --whatsapp-green: #25D366;
-            --whatsapp-dark-green: #128C7E;
-            --whatsapp-light: #e5f4ea;
-            --whatsapp-gray: #f0f2f5;
-            --whatsapp-dark-gray: #667781;
+            --whatsapp-green: #128C7E;
+            --whatsapp-light-green: #25D366;
+            --whatsapp-teal-green: #075E54;
+            --whatsapp-chat-bg: #e5ddd5;
             --whatsapp-white: #ffffff;
-            --whatsapp-black: #111b21;
+            --whatsapp-gray: #3b4a54;
+            --whatsapp-light-gray: #f0f2f5;
         }
 
         body {
-            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
-            background-color: var(--whatsapp-gray);
+            font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+            background-color: var(--whatsapp-light-gray);
             margin: 0;
-            padding: 0;
-            color: var(--whatsapp-black);
+            color: var(--whatsapp-gray);
             height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .edit-profile-container {
-            background-color: var(--whatsapp-white);
-            width: 100%;
-            max-width: 500px;
-            height: 100%;
-            max-height: 800px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         }
 
         .header {
-            background-color: var(--whatsapp-dark-green);
+            background-color: var(--whatsapp-teal-green);
             color: white;
             padding: 15px 20px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        .header h2 {
-            margin: 0;
+        .header i {
+            font-size: 20px;
+            margin-right: 20px;
+            cursor: pointer;
+        }
+
+        .header h1 {
+            font-size: 19px;
             font-weight: 500;
-            font-size: 1.2rem;
+            margin: 0;
         }
 
-        .back-button {
+        .container {
+            max-width: 800px;
+            margin: 70px auto 20px;
+            background-color: var(--whatsapp-white);
+            border-radius: 8px;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .profile-header {
+            background-color: var(--whatsapp-teal-green);
+            padding: 30px 20px 20px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .photo-container {
+            margin-bottom: 15px;
+        }
+
+        .photo-container img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid rgba(255,255,255,0.3);
+            object-fit: cover;
+        }
+
+        .profile-header h2 {
+            margin: 10px 0 5px;
+            font-weight: 500;
+        }
+
+        .profile-header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .profile-details {
+            padding: 15px 0;
+        }
+
+        .detail-item {
+            display: flex;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--whatsapp-light-gray);
+            align-items: center;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-icon {
+            width: 24px;
+            text-align: center;
+            margin-right: 15px;
+            color: var(--whatsapp-teal-green);
+        }
+
+        .detail-content {
+            flex: 1;
+        }
+
+        .detail-content h4 {
+            margin: 0 0 3px;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .detail-content p {
+            margin: 0;
+            color: var(--whatsapp-gray);
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        .action-buttons {
+            display: flex;
+            padding: 15px;
+            background-color: var(--whatsapp-light-gray);
+            border-top: 1px solid #ddd;
+        }
+
+        .action-button {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            margin: 0 5px;
+            border-radius: 5px;
+            background-color: var(--whatsapp-green);
             color: white;
             text-decoration: none;
-            font-size: 1.5rem;
-        }
-
-        .profile-content {
-            padding: 20px;
-            overflow-y: auto;
-            flex-grow: 1;
-        }
-
-        .profile-picture-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .profile-picture {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 10px;
-            border: 3px solid var(--whatsapp-light);
-        }
-
-        .change-photo {
-            color: var(--whatsapp-dark-green);
-            background: none;
-            border: none;
-            font-size: 0.9rem;
-            cursor: pointer;
             font-weight: 500;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--whatsapp-dark-green);
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #e9edef;
-            border-radius: 8px;
-            font-size: 1rem;
-            background-color: var(--whatsapp-gray);
-            box-sizing: border-box;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--whatsapp-dark-green);
-            background-color: var(--whatsapp-white);
-        }
-
-        input[disabled] {
-            background-color: #f5f6f6;
-            color: var(--whatsapp-dark-gray);
-            cursor: not-allowed;
-        }
-
-        .save-button {
-            background-color: var(--whatsapp-dark-green);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 12px;
-            width: 100%;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            margin-top: 20px;
             transition: background-color 0.2s;
         }
 
-        .save-button:hover {
-            background-color: #075e54;
+        .action-button:hover {
+            background-color: var(--whatsapp-teal-green);
         }
 
-        .non-editable-note {
-            color: var(--whatsapp-dark-gray);
-            font-size: 0.8rem;
+        .action-button.secondary {
+            background-color: #f0f2f5;
+            color: var(--whatsapp-gray);
+        }
+
+        .action-button.secondary:hover {
+            background-color: #e5e5e5;
+        }
+
+        .password-warning {
+            background-color: #fff8e1;
+            padding: 10px 20px;
+            margin: 10px 20px;
+            border-radius: 5px;
+            color: #ff6d00;
+            font-size: 14px;
             text-align: center;
-            margin-top: 10px;
-            font-style: italic;
-        }
-
-        .error-message {
-            color: #ff3333;
-            font-size: 0.8rem;
-            margin-top: 5px;
+            border-left: 4px solid #ff6d00;
         }
 
         @media (max-width: 600px) {
-            .edit-profile-container {
-                max-height: none;
-                height: 100vh;
+            .container {
+                margin: 60px 10px 20px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-button {
+                margin: 5px 0;
             }
         }
     </style>
 </head>
 <body>
-    <div class="edit-profile-container">
-        <div class="header">
-            <a href="{% url 'profile' %}" class="back-button">←</a>
-            <h2>Edit Profile</h2>
+<div class="header">
+    <i class="fas fa-arrow-left" onclick="history.back()"></i>
+    <h1>Profile</h1>
+</div>
+<div class="container">
+    <div class="profile-header">
+        <div class="photo-container">
+            {% if student.photo %}
+                <img src="{{ student.photo.url }}" alt="Profile Photo">
+            {% else %}
+                <div style="width:120px;height:120px;border-radius:50%;background:#ddd;margin:0 auto;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-user" style="font-size:40px;color:#888;"></i>
+                </div>
+            {% endif %}
         </div>
-
-        <div class="profile-content">
-            <div class="profile-picture-section">
-                {% if form.instance.photo %}
-                    <img src="{{ form.instance.photo.url }}" alt="Profile Picture" class="profile-picture">
-                {% else %}
-                    <div class="profile-picture" style="background-color: #dfe5e7; display: flex; align-items: center; justify-content: center;">
-                        <span style="font-size: 3rem; color: #7d8b91;">👤</span>
-                    </div>
-                {% endif %}
-                <button type="button" class="change-photo">Change photo</button>
-                {{ form.photo }}
+        <h2>{{ student.name }}</h2>
+        <p>Student</p>
+    </div>
+    {% if temporary_email_warning %}
+    <div class="password-warning">
+        If you used a temporary email, please change your password!
+    </div>
+    {% endif %}
+    <div class="profile-details">
+        <div class="detail-item">
+            <div class="detail-icon">
+                <i class="fas fa-venus-mars"></i>
             </div>
-
-            <form method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-
-                {% if form.non_field_errors %}
-                    <div class="error-message">
-                        {% for error in form.non_field_errors %}
-                            {{ error }}
-                        {% endfor %}
-                    </div>
-                {% endif %}
-
-                <div class="form-group">
-                    <label for="{{ form.name.id_for_label }}">Name</label>
-                    {{ form.name }}
-                    {% if form.name.errors %}
-                        <div class="error-message">{{ form.name.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.email.id_for_label }}">Email</label>
-                    <input type="email" id="{{ form.email.id_for_label }}" value="{{ form.email.value|default:'' }}" disabled>
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.dob.id_for_label }}">Date of Birth</label>
-                    {{ form.dob }}
-                    {% if form.dob.errors %}
-                        <div class="error-message">{{ form.dob.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
-                    {{ form.phone_number }}
-                    {% if form.phone_number.errors %}
-                        <div class="error-message">{{ form.phone_number.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.gender.id_for_label }}">Gender</label>
-                    {{ form.gender }}
-                    {% if form.gender.errors %}
-                        <div class="error-message">{{ form.gender.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" value="••••••••" disabled>
-                </div>
-
-                <p class="non-editable-note">* Email and password cannot be changed here</p>
-
-                <button type="submit" class="save-button">SAVE CHANGES</button>
-            </form>
+            <div class="detail-content">
+                <h4>Gender</h4>
+                <p>{{ student.gender }}</p>
+            </div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-icon">
+                <i class="fas fa-birthday-cake"></i>
+            </div>
+            <div class="detail-content">
+                <h4>Date of Birth</h4>
+                <p>{{ student.dob }}</p>
+            </div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-icon">
+                <i class="fas fa-phone"></i>
+            </div>
+            <div class="detail-content">
+                <h4>Phone Number</h4>
+                <p>{{ student.phone_number }}</p>
+            </div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-icon">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <div class="detail-content">
+                <h4>Email</h4>
+                <p>{{ student.email }}</p>
+            </div>
         </div>
     </div>
-
-    <script>
-        // Change photo button functionality
-        document.querySelector('.change-photo').addEventListener('click', function() {
-            document.getElementById('{{ form.photo.id_for_label }}').click();
-        });
-
-        // Hide the file input initially
-        document.getElementById('{{ form.photo.id_for_label }}').style.display = 'none';
-
-        // Preview image when selected
-        document.getElementById('{{ form.photo.id_for_label }}').addEventListener('change', function(e) {
-            if (e.target.files && e.target.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const profilePicContainer = document.querySelector('.profile-picture-section');
-                    let profilePic = profilePicContainer.querySelector('.profile-picture');
-
-                    if (profilePic.tagName === 'IMG') {
-                        profilePic.src = event.target.result;
-                    } else {
-                        // Replace the placeholder div with an image
-                        const newImg = document.createElement('img');
-                        newImg.src = event.target.result;
-                        newImg.className = 'profile-picture';
-                        profilePic.parentNode.replaceChild(newImg, profilePic);
-                    }
-                };
-                reader.readAsDataURL(e.target.files[0]);
-            }
-        });
-    </script>
+    <div class="action-buttons">
+        <a href="{% url 'edit_profile' student_id=student.id %}" class="action-button">
+            <i class="fas fa-edit"></i> Edit Profile
+        </a>
+        <a href="{% url 'change_password' %}" class="action-button secondary">
+            <i class="fas fa-key"></i> Change Password
+        </a>
+    </div>
+</div>
 </body>
 </html>
