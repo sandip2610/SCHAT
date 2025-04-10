@@ -252,3 +252,41 @@ def get_search_result(request):
     user_query = request.GET.get('query', '')
     result = google_search(user_query)
     return JsonResponse({'reply': result})
+
+
+
+# In your views.py
+def send_message(request):
+    if request.method == 'POST':
+        content = request.POST.get('content', '')
+        receiver_id = request.POST.get('receiver_id')
+        file = request.FILES.get('file')
+
+        # Handle location messages
+        is_location = request.POST.get('is_location', False)
+        is_live_location = request.POST.get('is_live_location', False)
+        latitude = request.POST.get('latitude')
+        longitude = request.POST.get('longitude')
+
+        if is_location:
+            # Create a location message
+            message = Message.objects.create(
+                sender=request.user,
+                receiver_id=receiver_id,
+                is_location=True,
+                is_live_location=is_live_location,
+                latitude=latitude,
+                longitude=longitude,
+                content="Location shared"
+            )
+        else:
+            # Regular message
+            message = Message.objects.create(
+                sender=request.user,
+                receiver_id=receiver_id,
+                content=content,
+                file=file
+            )
+
+        # Return response
+        return JsonResponse({'status': 'success', 'message_id': message.id})

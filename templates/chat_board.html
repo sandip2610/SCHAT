@@ -7,6 +7,9 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Add these in the head section -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <style>
         /* General Styles */
         body {
@@ -581,96 +584,227 @@
                 transform: translateY(0);
             }
         }
+
         .profile-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: #dfe5e7;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #7d8b91;
-    font-size: 20px;
-    border: 2px solid #25d366;
-    cursor: pointer;
-}
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #dfe5e7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7d8b91;
+            font-size: 20px;
+            border: 2px solid #25d366;
+            cursor: pointer;
+        }
+
+        /* Location Sharing Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1002;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+        }
+
+        .modal-content {
+            background-color: #f8f9fa;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        #map {
+            width: 100%;
+            height: 300px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .location-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .location-options button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #075e54;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .location-options button:hover {
+            background-color: #128c7e;
+        }
+
+        .location-options .stop-btn {
+            background-color: #dc3545;
+            display: none; /* Hidden by default */
+        }
+
+        .location-options .stop-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Location message styles */
+        .location-message {
+            max-width: 250px;
+            height: 150px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .location-thumbnail {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .location-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 8px;
+        }
+
+        .location-info h4 {
+            margin: 0 0 5px 0;
+            font-size: 14px;
+        }
+
+        .location-info p {
+            margin: 0;
+            font-size: 12px;
+        }
+
+        .live-location-badge {
+            background-color: #dc3545;
+            color: white;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            margin-left: 5px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
         /* Video Call Styles */
-.video-call-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.9);
-    z-index: 1001;
-    justify-content: center;
-    align-items: center;
-}
-
-.video-call-container {
-    width: 90%;
-    max-width: 800px;
-    background: #fff;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.video-header {
-    background: #075e54;
-    color: white;
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.video-header h2 {
-    margin: 0;
-    font-size: 18px;
-}
-
-.end-call-btn {
-    background: #dc3545;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.3s;
-}
-
-.end-call-btn:hover {
-    background: #c82333;
-}
-
-.video-windows {
+.video-container {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    padding: 15px;
-    background: #333;
+    margin-bottom: 15px;
 }
 
-.video-windows video {
-    width: 100%;
-    border-radius: 5px;
+.video-container video {
     background: #000;
+    border-radius: 8px;
+    flex: 1;
+    min-width: 300px;
+    height: 225px;
 }
 
-#localVideo {
-    width: 25%;
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    border: 2px solid #25d366;
+.call-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
 }
 
-#remoteVideo {
-    width: 100%;
-    height: 70vh;
+.call-controls button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 50px;
+    background-color: #075e54;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.call-controls button:hover {
+    background-color: #128c7e;
+}
+
+.call-controls .end-call {
+    background-color: #dc3545;
+}
+
+.call-controls .end-call:hover {
+    background-color: #c82333;
+}
+
+/* Call notification */
+.call-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #075e54;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 5px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.call-notification button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.call-notification .accept-call {
+    background: #25d366;
+    color: white;
+}
+
+.call-notification .reject-call {
+    background: #dc3545;
+    color: white;
 }
     </style>
 </head>
@@ -745,7 +879,9 @@
                         <h2>{{ receiver.name }}</h2>
                     </div>
                     <div class="chat-header-buttons">
-                        <a href="#" onclick="startVideoCall()">Call</a>
+                        <a href="#" onclick="toggleLocationSharing()">Share Location</a>
+                        <a href="#" onclick="startVideoCall()"><i class="fas fa-video"></i> Video Call</a>
+
                     </div>
                 </div>
                 <div id="chat-window">
@@ -799,18 +935,33 @@
             {% endif %}
         </div>
     </div>
-    <!-- Video Call Modal -->
-<div id="videoCallModal" class="video-call-modal">
-    <div class="video-call-container">
-        <div class="video-header">
-            <h2>Call with <span id="callerName"></span></h2>
-            <button class="end-call-btn" onclick="endCall()">
-                <i class="fas fa-phone-slash"></i> End Call
-            </button>
+
+    <div id="locationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeLocationModal()">&times;</span>
+            <h2>Share Your Location</h2>
+            <div id="map" style="width: 100%; height: 300px;"></div>
+            <div class="location-options">
+                <button onclick="startSharingLocation()">Share Live Location</button>
+                <button onclick="shareCurrentLocation()">Send Current Location</button>
+                <button onclick="stopSharingLocation()" class="stop-btn">Stop Sharing</button>
+            </div>
         </div>
-        <div class="video-windows">
+    </div>
+
+
+    <div id="videoCallModal" class="modal">
+    <div class="modal-content" style="max-width: 800px;">
+        <span class="close" onclick="endVideoCall()">&times;</span>
+        <h2>Video Call with <span id="callRecipientName">{{ receiver.name }}</span></h2>
+        <div class="video-container">
             <video id="localVideo" autoplay muted playsinline></video>
             <video id="remoteVideo" autoplay playsinline></video>
+        </div>
+        <div class="call-controls">
+            <button onclick="toggleMute()" id="muteBtn"><i class="fas fa-microphone"></i> Mute</button>
+            <button onclick="toggleVideo()" id="videoBtn"><i class="fas fa-video"></i> Video Off</button>
+            <button onclick="endVideoCall()" class="end-call"><i class="fas fa-phone-slash"></i> End Call</button>
         </div>
     </div>
 </div>
@@ -938,65 +1089,311 @@
         window.addEventListener('load', checkScreenSize);
         window.addEventListener('resize', checkScreenSize);
 
+        // Location sharing variables
+        let locationInterval;
+        let isSharingLocation = false;
+        let map;
+        let marker;
+        let currentLocationMarker;
+
+        // Initialize map
+        function initMap() {
+            map = L.map('map').setView([0, 0], 2); // Default view
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // Try to locate the user
+            map.locate({setView: true, maxZoom: 16});
+
+            map.on('locationfound', function(e) {
+                if (currentLocationMarker) {
+                    map.removeLayer(currentLocationMarker);
+                }
+
+                currentLocationMarker = L.marker(e.latlng).addTo(map)
+                    .bindPopup("Your current location").openPopup();
+
+                L.circle(e.latlng, {
+                    color: 'blue',
+                    fillColor: '#30f',
+                    fillOpacity: 0.2,
+                    radius: e.accuracy / 2
+                }).addTo(map);
+            });
+
+            map.on('locationerror', function(e) {
+                alert("Location access denied. Please enable location services to share your location.");
+            });
+        }
+
+        function toggleLocationSharing() {
+            const modal = document.getElementById('locationModal');
+            modal.style.display = 'block';
+
+            // Initialize map if not already done
+            if (!map) {
+                initMap();
+            } else {
+                // Try to re-center the map on the user
+                map.locate({setView: true, maxZoom: 16});
+            }
+        }
+
+        function closeLocationModal() {
+            const modal = document.getElementById('locationModal');
+            modal.style.display = 'none';
+        }
+
+        function startSharingLocation() {
+            if (isSharingLocation) return;
+
+            if (navigator.geolocation) {
+                // First get the current position
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        isSharingLocation = true;
+                        document.querySelector('.location-options .stop-btn').style.display = 'block';
+
+                        const { latitude, longitude } = position.coords;
+
+                        // Update the map with the initial position
+                        updateMapWithLocation(latitude, longitude);
+
+                        // Update the message input with location info
+                        updateLocationMessage(latitude, longitude);
+
+                        // Start updating location periodically
+                        locationInterval = setInterval(() => {
+                            navigator.geolocation.getCurrentPosition(
+                                (newPosition) => {
+                                    const { latitude: newLat, longitude: newLng } = newPosition.coords;
+                                    updateMapWithLocation(newLat, newLng);
+                                    updateLocationMessage(newLat, newLng);
+                                },
+                                (error) => {
+                                    console.error("Error updating location:", error);
+                                }
+                            );
+                        }, 15000); // Update every 15 seconds
+
+                        closeLocationModal();
+                    },
+                    (error) => {
+                        console.error("Error getting location:", error);
+                        alert("Could not get your location. Please make sure location services are enabled.");
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        }
+
+        function updateMapWithLocation(lat, lng) {
+            const newLatLng = L.latLng(lat, lng);
+
+            if (marker) {
+                marker.setLatLng(newLatLng);
+            } else {
+                marker = L.marker(newLatLng).addTo(map)
+                    .bindPopup("Sharing this location").openPopup();
+            }
+
+            map.setView(newLatLng, 16);
+        }
+
+        function updateLocationMessage(lat, lng) {
+            const messageInput = document.querySelector('.chat-input textarea');
+            const mapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+            messageInput.value = `📍 Sharing my live location - ${mapsUrl}`;
+            messageInput.focus();
+        }
+
+        function stopSharingLocation() {
+            if (!isSharingLocation) return;
+
+            isSharingLocation = false;
+            clearInterval(locationInterval);
+
+            if (marker) {
+                map.removeLayer(marker);
+                marker = null;
+            }
+
+            // Clear the location from the input
+            const messageInput = document.querySelector('.chat-input textarea');
+            messageInput.value = '';
+
+            closeLocationModal();
+        }
+
+        function shareCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+                        const messageInput = document.querySelector('.chat-input textarea');
+                        messageInput.value = `📍 My current location - ${mapsUrl}`;
+                        messageInput.focus();
+
+                        closeLocationModal();
+                    },
+                    (error) => {
+                        console.error("Error getting location:", error);
+                        alert("Could not get your location. Please make sure location services are enabled.");
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        }
+
+        // Form submission handler
+        document.querySelector('.chat-form').addEventListener('submit', function(e) {
+            // If sharing live location, stop sharing when sending
+            if (isSharingLocation) {
+                stopSharingLocation();
+            }
+
+            // Get the message content
+            const messageInput = document.querySelector('.chat-input textarea');
+            const messageContent = messageInput.value.trim();
+
+            // Check if this is a location message
+            if (messageContent.includes('📍')) {
+                // Here you would typically send this to your server
+                console.log("Sending location message:", messageContent);
+            }
+
+            // Proceed with normal form submission
+        });
+
+        // Check geolocation permissions when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            if (navigator.permissions && navigator.permissions.query) {
+                navigator.permissions.query({name: 'geolocation'})
+                    .then(function(result) {
+                        if (result.state === 'denied') {
+                            console.log("Geolocation permission denied");
+                        }
+                    });
+            }
+        });
 
 
-
-        // WebRTC variables
+        // Video call variables
 let localStream;
 let remoteStream;
 let peerConnection;
+let isMuted = false;
+let isVideoOff = false;
 let isCaller = false;
-const configuration = {
-    iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        // You may want to add your own TURN server here for better reliability
-    ]
-};
+let callActive = false;
 
-// Start a video call
+// For a real application, you would need a signaling server (WebSocket)
+// This is a simplified version for demonstration
+
 function startVideoCall() {
-    if (!navigator.mediaDevices || !window.RTCPeerConnection) {
-        alert("WebRTC is not supported in your browser");
-        return;
+    if (callActive) return;
+
+    isCaller = true;
+    const modal = document.getElementById('videoCallModal');
+    modal.style.display = 'block';
+
+    // In a real app, you would send a call request to the other user via your server
+    console.log("Calling...");
+
+    startLocalStream();
+}
+
+function startLocalStream() {
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        .then(stream => {
+            localStream = stream;
+            const localVideo = document.getElementById('localVideo');
+            localVideo.srcObject = stream;
+
+            if (isCaller) {
+                // In a real app, you would create a peer connection here
+                // and send an offer to the other user
+                console.log("Local stream started, creating offer...");
+            }
+        })
+        .catch(error => {
+            console.error("Error accessing media devices:", error);
+            alert("Could not access camera or microphone. Please check permissions.");
+        });
+}
+
+function acceptIncomingCall() {
+    const modal = document.getElementById('videoCallModal');
+    modal.style.display = 'block';
+    startLocalStream();
+}
+
+function endVideoCall() {
+    const modal = document.getElementById('videoCallModal');
+    modal.style.display = 'none';
+
+    // Stop all tracks
+    if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+    }
+    if (remoteStream) {
+        remoteStream.getTracks().forEach(track => track.stop());
     }
 
-    document.getElementById('callerName').textContent = "{{ receiver.name }}";
-    document.getElementById('videoCallModal').style.display = 'flex';
+    // Reset video elements
+    document.getElementById('localVideo').srcObject = null;
+    document.getElementById('remoteVideo').srcObject = null;
 
-    // Show calling UI
-    showCallingUI();
+    // In a real app, you would send a hangup message to the other user
+    console.log("Call ended");
 
-    // Start the call process
-    startCallProcess();
+    callActive = false;
 }
 
-function showCallingUI() {
-    // Here you would typically show a "calling..." UI
-    // For now, we'll just proceed directly to getting media
-    getLocalMedia();
+function toggleMute() {
+    if (!localStream) return;
+
+    isMuted = !isMuted;
+    localStream.getAudioTracks().forEach(track => {
+        track.enabled = !isMuted;
+    });
+
+    const muteBtn = document.getElementById('muteBtn');
+    muteBtn.innerHTML = isMuted ? '<i class="fas fa-microphone-slash"></i> Unmute' : '<i class="fas fa-microphone"></i> Mute';
 }
 
-async function getLocalMedia() {
-    try {
-        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        document.getElementById('localVideo').srcObject = localStream;
+function toggleVideo() {
+    if (!localStream) return;
 
-        if (isCaller) {
-            // As the caller, create an offer
-            createPeerConnection();
-            createOffer();
-        } else {
-            // As the callee, wait for offer
-            // In a real app, this would be triggered by a signaling message
-        }
-    } catch (error) {
-        console.error("Error accessing media devices:", error);
-        alert("Could not access camera/microphone. Please check permissions.");
-        endCall();
-    }
+    isVideoOff = !isVideoOff;
+    localStream.getVideoTracks().forEach(track => {
+        track.enabled = !isVideoOff;
+    });
+
+    const videoBtn = document.getElementById('videoBtn');
+    videoBtn.innerHTML = isVideoOff ? '<i class="fas fa-video-slash"></i> Video On' : '<i class="fas fa-video"></i> Video Off';
 }
 
+// For a real application, you would need WebRTC implementation:
+/*
 function createPeerConnection() {
+    const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
     peerConnection = new RTCPeerConnection(configuration);
 
     // Add local stream to connection
@@ -1004,99 +1401,72 @@ function createPeerConnection() {
         peerConnection.addTrack(track, localStream);
     });
 
-    // Set up remote stream
-    remoteStream = new MediaStream();
-    document.getElementById('remoteVideo').srcObject = remoteStream;
+    // Handle remote stream
+    peerConnection.ontrack = event => {
+        remoteStream = event.streams[0];
+        document.getElementById('remoteVideo').srcObject = remoteStream;
+    };
 
     // Handle ICE candidates
     peerConnection.onicecandidate = event => {
         if (event.candidate) {
-            // Send the candidate to the other peer (via signaling server)
-            console.log("New ICE candidate:", event.candidate);
-            // In a real app, you'd send this to the other peer
-        }
-    };
-
-    // Handle incoming tracks
-    peerConnection.ontrack = event => {
-        event.streams[0].getTracks().forEach(track => {
-            remoteStream.addTrack(track);
-        });
-    };
-
-    peerConnection.onconnectionstatechange = event => {
-        switch(peerConnection.connectionState) {
-            case "connected":
-                console.log("Call connected");
-                break;
-            case "disconnected":
-            case "failed":
-                console.log("Call disconnected");
-                endCall();
-                break;
-            case "closed":
-                console.log("Call closed");
-                break;
+            // Send candidate to other peer
         }
     };
 }
 
-async function createOffer() {
-    try {
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
-
-        console.log("Created offer:", offer);
-        // In a real app, you'd send this offer to the other peer via signaling
-    } catch (error) {
-        console.error("Error creating offer:", error);
-        endCall();
-    }
+function createOffer() {
+    peerConnection.createOffer()
+        .then(offer => {
+            return peerConnection.setLocalDescription(offer);
+        })
+        .then(() => {
+            // Send offer to other peer
+        })
+        .catch(error => console.error("Error creating offer:", error));
 }
 
-// This would be called when receiving an offer from the other peer
-async function handleOffer(offer) {
-    if (!peerConnection) {
-        createPeerConnection();
-    }
+function handleOffer(offer) {
+    peerConnection.setRemoteDescription(offer)
+        .then(() => {
+            return peerConnection.createAnswer();
+        })
+        .then(answer => {
+            return peerConnection.setLocalDescription(answer);
+        })
+        .then(() => {
+            // Send answer to other peer
+        })
+        .catch(error => console.error("Error handling offer:", error));
+}
+*/
 
-    try {
-        await peerConnection.setRemoteDescription(offer);
-        const answer = await peerConnection.createAnswer();
-        await peerConnection.setLocalDescription(answer);
+// Simulate receiving a call (for demo purposes)
+function simulateIncomingCall() {
+    if (callActive) return;
 
-        console.log("Created answer:", answer);
-        // In a real app, you'd send this answer back to the caller via signaling
-    } catch (error) {
-        console.error("Error handling offer:", error);
-        endCall();
-    }
+    const notification = document.createElement('div');
+    notification.className = 'call-notification';
+    notification.innerHTML = `
+        <span>Incoming video call from ${document.getElementById('callRecipientName').textContent}</span>
+        <button class="accept-call" onclick="acceptIncomingCall(); this.parentElement.remove()">Accept</button>
+        <button class="reject-call" onclick="this.parentElement.remove()">Reject</button>
+    `;
+    document.body.appendChild(notification);
+
+    // Auto remove after 30 seconds if not answered
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 30000);
 }
 
-// End the call
-function endCall() {
-    if (peerConnection) {
-        peerConnection.close();
-        peerConnection = null;
-    }
-
-    if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
-        localStream = null;
-    }
-
-    if (remoteStream) {
-        remoteStream.getTracks().forEach(track => track.stop());
-        remoteStream = null;
-    }
-
-    document.getElementById('localVideo').srcObject = null;
-    document.getElementById('remoteVideo').srcObject = null;
-    document.getElementById('videoCallModal').style.display = 'none';
-}
-
-// Handle page unload
-window.addEventListener('beforeunload', endCall);
+// For demo purposes - simulate receiving a call after 5 seconds
+setTimeout(() => {
+    // Comment this out if you don't want the demo incoming call
+     simulateIncomingCall();
+}, 5000);
     </script>
 </body>
 </html>
