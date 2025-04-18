@@ -1294,179 +1294,164 @@
         });
 
 
-        // Video call variables
-let localStream;
-let remoteStream;
-let peerConnection;
-let isMuted = false;
-let isVideoOff = false;
-let isCaller = false;
-let callActive = false;
 
-// For a real application, you would need a signaling server (WebSocket)
-// This is a simplified version for demonstration
 
-function startVideoCall() {
-    if (callActive) return;
 
-    isCaller = true;
-    const modal = document.getElementById('videoCallModal');
-    modal.style.display = 'block';
 
-    // In a real app, you would send a call request to the other user via your server
-    console.log("Calling...");
 
-    startLocalStream();
-}
 
-function startLocalStream() {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-        .then(stream => {
-            localStream = stream;
-            const localVideo = document.getElementById('localVideo');
-            localVideo.srcObject = stream;
 
-            if (isCaller) {
-                // In a real app, you would create a peer connection here
-                // and send an offer to the other user
-                console.log("Local stream started, creating offer...");
-            }
-        })
-        .catch(error => {
-            console.error("Error accessing media devices:", error);
-            alert("Could not access camera or microphone. Please check permissions.");
-        });
-}
 
-function acceptIncomingCall() {
-    const modal = document.getElementById('videoCallModal');
-    modal.style.display = 'block';
-    startLocalStream();
-}
 
-function endVideoCall() {
-    const modal = document.getElementById('videoCallModal');
-    modal.style.display = 'none';
 
-    // Stop all tracks
-    if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
-    }
-    if (remoteStream) {
-        remoteStream.getTracks().forEach(track => track.stop());
-    }
 
-    // Reset video elements
-    document.getElementById('localVideo').srcObject = null;
-    document.getElementById('remoteVideo').srcObject = null;
 
-    // In a real app, you would send a hangup message to the other user
-    console.log("Call ended");
 
-    callActive = false;
-}
+    // 🔁 Dynamic user info from Django template
+    const currentUserId = "{{ current_user.id }}";
+    const currentUserName = "{{ current_user.name }}";
+    const receiverUserId = "{{ receiver.id|default:'' }}";
+    const receiverUserName = "{{ receiver.name|default:'' }}";
 
-function toggleMute() {
-    if (!localStream) return;
+    // ✅ Global variables
+    let localStream;
+    let remoteStream;
+    let peerConnection;
+    let isMuted = false;
+    let isVideoOff = false;
+    let isCaller = false;
+    let callActive = false;
 
-    isMuted = !isMuted;
-    localStream.getAudioTracks().forEach(track => {
-        track.enabled = !isMuted;
-    });
+    // 1️⃣ WebSocket connection setup
+    const socket = new WebSocket('ws://' + window.location.host + '/ws/video-call/');
 
-    const muteBtn = document.getElementById('muteBtn');
-    muteBtn.innerHTML = isMuted ? '<i class="fas fa-microphone-slash"></i> Unmute' : '<i class="fas fa-microphone"></i> Mute';
-}
+    // 2️⃣ WebSocket message handler
+    socket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
 
-function toggleVideo() {
-    if (!localStream) return;
-
-    isVideoOff = !isVideoOff;
-    localStream.getVideoTracks().forEach(track => {
-        track.enabled = !isVideoOff;
-    });
-
-    const videoBtn = document.getElementById('videoBtn');
-    videoBtn.innerHTML = isVideoOff ? '<i class="fas fa-video-slash"></i> Video On' : '<i class="fas fa-video"></i> Video Off';
-}
-
-// For a real application, you would need WebRTC implementation:
-/*
-function createPeerConnection() {
-    const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
-    peerConnection = new RTCPeerConnection(configuration);
-
-    // Add local stream to connection
-    localStream.getTracks().forEach(track => {
-        peerConnection.addTrack(track, localStream);
-    });
-
-    // Handle remote stream
-    peerConnection.ontrack = event => {
-        remoteStream = event.streams[0];
-        document.getElementById('remoteVideo').srcObject = remoteStream;
-    };
-
-    // Handle ICE candidates
-    peerConnection.onicecandidate = event => {
-        if (event.candidate) {
-            // Send candidate to other peer
+        if (data.type === 'call' && data.to === currentUserId) {
+            simulateIncomingCall(); // অন্য ইউজারের কল নোটিফিকেশন দেখাও
+        } else if (data.type === 'offer') {
+            handleOffer(data.offer);
+        } else if (data.type === 'answer') {
+            peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+        } else if (data.type === 'ice-candidate') {
+            peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
         }
     };
-}
 
-function createOffer() {
-    peerConnection.createOffer()
-        .then(offer => {
-            return peerConnection.setLocalDescription(offer);
-        })
-        .then(() => {
-            // Send offer to other peer
-        })
-        .catch(error => console.error("Error creating offer:", error));
-}
+    // 3️⃣ Start video call (as caller)
+    function startVideoCall() {
+        if (callActive || !receiverUserId) return;
 
-function handleOffer(offer) {
-    peerConnection.setRemoteDescription(offer)
-        .then(() => {
-            return peerConnection.createAnswer();
-        })
-        .then(answer => {
-            return peerConnection.setLocalDescription(answer);
-        })
-        .then(() => {
-            // Send answer to other peer
-        })
-        .catch(error => console.error("Error handling offer:", error));
-}
-*/
+        isCaller = true;
+        callActive = true;
 
-// Simulate receiving a call (for demo purposes)
-function simulateIncomingCall() {
-    if (callActive) return;
+        const modal = document.getElementById('videoCallModal');
+        if (modal) modal.style.display = 'block';
 
-    const notification = document.createElement('div');
-    notification.className = 'call-notification';
-    notification.innerHTML = `
-        <span>Incoming video call from ${document.getElementById('callRecipientName').textContent}</span>
-        <button class="accept-call" onclick="acceptIncomingCall(); this.parentElement.remove()">Accept</button>
-        <button class="reject-call" onclick="this.parentElement.remove()">Reject</button>
-    `;
-    document.body.appendChild(notification);
+        socket.send(JSON.stringify({
+            type: 'call',
+            to: receiverUserId,
+            from: currentUserId
+        }));
 
-    // Auto remove after 30 seconds if not answered
+        console.log(`📞 Calling ${receiverUserName}...`);
+        startLocalStream();
+    }
+
+    // 4️⃣ Start local video stream
+    function startLocalStream() {
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .then(stream => {
+                localStream = stream;
+
+                const localVideo = document.getElementById('localVideo');
+                if (localVideo) {
+                    localVideo.srcObject = stream;
+                    localVideo.muted = true;
+                    localVideo.play();
+                }
+
+                if (isCaller) {
+                    console.log("🔧 Ready to create offer (WebRTC)");
+                    // Future: createPeerConnection();
+                }
+            })
+            .catch(error => {
+                console.error("❌ Could not access camera/mic:", error);
+                alert("Camera/microphone access is required to place a call.");
+            });
+    }
+
+    // 5️⃣ Accept incoming call
+    function acceptIncomingCall() {
+        const modal = document.getElementById('videoCallModal');
+        modal.style.display = 'block';
+        callActive = true;
+        startLocalStream();
+    }
+
+    // 6️⃣ End call
+    function endVideoCall() {
+        const modal = document.getElementById('videoCallModal');
+        if (modal) modal.style.display = 'none';
+
+        if (localStream) localStream.getTracks().forEach(track => track.stop());
+        if (remoteStream) remoteStream.getTracks().forEach(track => track.stop());
+
+        document.getElementById('localVideo').srcObject = null;
+        document.getElementById('remoteVideo').srcObject = null;
+
+        callActive = false;
+        console.log("📴 Call ended.");
+    }
+
+    // 7️⃣ Toggle mic
+    function toggleMute() {
+        if (!localStream) return;
+        isMuted = !isMuted;
+        localStream.getAudioTracks().forEach(track => track.enabled = !isMuted);
+        document.getElementById('muteBtn').innerHTML = isMuted ?
+            '<i class="fas fa-microphone-slash"></i> Unmute' :
+            '<i class="fas fa-microphone"></i> Mute';
+    }
+
+    // 8️⃣ Toggle video
+    function toggleVideo() {
+        if (!localStream) return;
+        isVideoOff = !isVideoOff;
+        localStream.getVideoTracks().forEach(track => track.enabled = !isVideoOff);
+        document.getElementById('videoBtn').innerHTML = isVideoOff ?
+            '<i class="fas fa-video-slash"></i> Video On' :
+            '<i class="fas fa-video"></i> Video Off';
+    }
+
+    // 9️⃣ Simulated incoming call for demo
+    function simulateIncomingCall() {
+        if (callActive) return;
+
+        const notification = document.createElement('div');
+        notification.className = 'call-notification';
+        notification.innerHTML = `
+            <span>📲 Incoming call from ${receiverUserName || 'Someone'}</span>
+            <button class="accept-call" onclick="acceptIncomingCall(); this.parentElement.remove()">Accept</button>
+            <button class="reject-call" onclick="this.parentElement.remove()">Reject</button>
+        `;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            if (notification.parentNode) notification.remove();
+        }, 30000);
+    }
+
+    // 🔒 Optionally simulate incoming call in 5s (testing only)
+    /*
     setTimeout(() => {
-        if (notification.parentNode) {
-            notification.remove();
-        }
-    }, 30000);
-}
+        simulateIncomingCall();
+    }, 5000);
+    */
 
-// For demo purposes - simulate receiving a call after 5 seconds
-setTimeout(() => {
-    // Comment this out if you don't want the demo incoming call
-     simulateIncomingCall();
-}, 5000);
     </script>
 </body>
 </html>
