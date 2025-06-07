@@ -30,7 +30,6 @@ def register(request):
         if not all([name, email, phone_number, dob, gender, password, photo]):
             messages.error(request, 'Please fill all the required fields.')
             return render(request, 'register.html')
-        # Check if email already exists
         if Student.objects.filter(email=email).exists():
             messages.error(request, 'This email is already registered. Please use a different one.')
             return render(request, 'register.html')
@@ -253,23 +252,16 @@ def get_search_result(request):
     result = google_search(user_query)
     return JsonResponse({'reply': result})
 
-
-
-# In your views.py
 def send_message(request):
     if request.method == 'POST':
         content = request.POST.get('content', '')
         receiver_id = request.POST.get('receiver_id')
         file = request.FILES.get('file')
-
-        # Handle location messages
         is_location = request.POST.get('is_location', False)
         is_live_location = request.POST.get('is_live_location', False)
         latitude = request.POST.get('latitude')
         longitude = request.POST.get('longitude')
-
         if is_location:
-            # Create a location message
             message = Message.objects.create(
                 sender=request.user,
                 receiver_id=receiver_id,
@@ -280,13 +272,10 @@ def send_message(request):
                 content="Location shared"
             )
         else:
-            # Regular message
             message = Message.objects.create(
                 sender=request.user,
                 receiver_id=receiver_id,
                 content=content,
                 file=file
             )
-
-        # Return response
         return JsonResponse({'status': 'success', 'message_id': message.id})
