@@ -163,5 +163,5 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 CSRF_TRUSTED_ORIGINS = [
-    'https://schat-1ss4.onrender.com'
+    'https://schat-dc6m.onrender.com'
 ]
